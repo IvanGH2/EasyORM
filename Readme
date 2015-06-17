@@ -1,0 +1,39 @@
+
+EasyORM library - BETA 
+
+The EasyORM library is a lightweight (~35kB) O/R mapping library designed to be easy and intuitive to use.  It 
+targets mostly small to mid-sized projects that communicate with a database either directly or through a web container (e.g Tomcat)
+
+
+WHAT EasyORM DOES
+
+- wraps the JDBC API
+
+- pools and reuses database connections via the ConnectionPool class
+
+- supports simple transaction management via the DBTransaction class including commits, rollbacks and isolation levels
+
+- maps result sets to plain Java objects and persists Java objects to a database (O/R mapping)
+
+- supports the active record pattern enhanced to an active range pattern
+
+- supports creating queries on the fly 
+
+- provides some generic query methods that work on any Java type
+
+- provides support for tables and views
+
+- provides exception handling support through the EasyORMException class (this class maps most checked exceptions)
+
+- provides integrated logging 
+
+- no need for any third party libraries or xml-s (annotations are used instead)
+
+
+WHAT EasyORM DOES NOT DO
+
+- it does not support EJB, JPA or any other JavaEE technologies
+
+- it does not try to convert an incompatible Java type to an SQL type (e.g. Long/long to Date etc)
+
+
