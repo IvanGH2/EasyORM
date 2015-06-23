@@ -37,3 +37,5 @@ WHAT EasyORM DOES NOT DO
 - it does not try to convert an incompatible Java type to an SQL type (e.g. Long/long to Date etc)
 
 
+
+If you have any questions, you can contact me at ivanbalen2@gmail.com
