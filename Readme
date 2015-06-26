@@ -36,6 +36,17 @@ WHAT EasyORM DOES NOT DO
 
 - it does not try to convert an incompatible Java type to an SQL type (e.g. Long/long to Date etc)
 
+CONTENT OF THE PROJECT
+
+1. This file
+
+2. The EasyORM.jar (EasyORM library binaries) 
+
+3. The EasyORM.zip (EasyORM library binaries plus source)
+
+4. SimpleEasyORM.zip (a simple console application demonstrating the use of the library)
+
+5. The EasyORM library tutorial 
 
 
 If you have any questions or would like to contribute to this project,  contact me at ivanbalen2@gmail.com
