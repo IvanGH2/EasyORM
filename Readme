@@ -13,7 +13,7 @@ WHAT EasyORM DOES
 
 - supports simple transaction management via the DBTransaction class including commits, rollbacks and isolation levels
 
-- maps result sets to plain Java objects and persists Java objects to a database (O/R mapping)
+- maps result sets to plain Java objects  and persists Java objects to a database (O/R mapping)
 
 - supports the active record pattern enhanced to an active range pattern
 
@@ -27,7 +27,9 @@ WHAT EasyORM DOES
 
 - provides integrated logging 
 
-- no need for any third party libraries or xml-s (annotations are used instead)
+- no need for any third party libraries or xml-s 
+
+- includes a POJO generator functionality
 
 
 WHAT EasyORM DOES NOT DO
@@ -40,13 +42,11 @@ CONTENT OF THE PROJECT
 
 1. This file
 
-2. The EasyORM.jar (EasyORM library binaries) 
+2. The EasyORM.jar (EasyORM library binaries - updated) 
 
 3. The EasyORM.zip (EasyORM library binaries plus source)
 
-4. SimpleEasyORM.zip (a simple console application demonstrating the use of the library)
-
-5. The EasyORM library tutorial 
+4. The EasyORM library tutorial 
 
 
 If you have any questions or would like to contribute to this project,  contact me at ivanbalen2@gmail.com
