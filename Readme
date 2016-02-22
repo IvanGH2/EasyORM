@@ -1,7 +1,7 @@
 
 EasyORM library - BETA 
 
-The EasyORM library is a lightweight (~35kB) O/R mapping library designed to be easy and intuitive to use.  It 
+The EasyORM library is a lightweight (~40kB) O/R mapping library designed to be easy and intuitive to use.  It 
 targets mostly small to mid-sized projects that communicate with a database either directly or through a web container (e.g Tomcat)
 
 
@@ -23,16 +23,12 @@ WHAT EasyORM DOES
 
 - provides support for tables and views
 
-- provides exception handling support through the EasyORMException class (this class maps most checked exceptions)
-
 - provides integrated logging 
-
-- no need for any third party libraries or xml-s 
 
 - includes a POJO generator functionality
 
 
-WHAT EasyORM DOES NOT DO
+What EasyORM does not do
 
 - it does not support EJB, JPA or any other JavaEE technologies
 
@@ -46,7 +42,7 @@ CONTENT OF THE PROJECT
 
 3. The EasyORM.zip (EasyORM library binaries plus source)
 
-4. The EasyORM library tutorial 
+4. The EasyORM library tutorial (be updated soon)
 
 
 If you have any questions or would like to contribute to this project,  contact me at ivanbalen2@gmail.com
