@@ -5,7 +5,7 @@ The EasyORM library is a lightweight (~40kB) O/R mapping library designed to be 
 targets mostly small to mid-sized projects that communicate with a database either directly or through a web container (e.g Tomcat)
 
 
-WHAT EasyORM DOES
+What EasyORM does
 
 - wraps the JDBC API
 
@@ -42,7 +42,7 @@ CONTENT OF THE PROJECT
 
 3. The EasyORM.zip (EasyORM library binaries plus source)
 
-4. The EasyORM library tutorial (be updated soon)
+4. The EasyORM library tutorial (to be updated soon!!)
 
 
 If you have any questions or would like to contribute to this project,  contact me at ivanbalen2@gmail.com
