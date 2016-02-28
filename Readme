@@ -17,7 +17,9 @@ What EasyORM does
 
 - supports the active record pattern enhanced to an active range pattern
 
-- supports creating queries on the fly 
+- supports batch updates
+
+- supports calling stored procedures
 
 - provides some generic query methods that work on any Java type
 
