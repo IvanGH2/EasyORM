@@ -359,7 +359,7 @@ public class DBSelect{
 	 * @return
 	 * @throws EasyORMException
 	 */
-	public Object getScalarValueForStoredProcedure(String procedureName, List<Object>paramValues) throws EasyORMException{
+	public Object getScalarValueForStoredProcedure(String procedureName, List<Object>paramValues, int returnType) throws EasyORMException{
         
         Object obj=null;
         ResultSet rs=null;
@@ -370,14 +370,18 @@ public class DBSelect{
         		params = this.generateParamsPlaceholder(paramValues.size());
         	  if(this.dbSchema!=null && !dbSchema.isEmpty())
         		  procedureName = dbSchema+"."+procedureName;
-        	  sqlQuery = "{call " + procedureName +"("+ params + ")}";
+        	  sqlQuery = "{ ? = call " + procedureName +"("+ params + ")}";
               stmt=conn.prepareCall(sqlQuery);
-              for(int i=1;i<=paramValues.size();i++)
-            	  stmt.setObject(i, paramValues.get(i-1));
-              rs = stmt.executeQuery();    
-              if(rs.next()){
+              stmt.registerOutParameter(1, returnType);
+              if(paramValues!=null&&!paramValues.isEmpty())
+            	  for(int i=0;i < paramValues.size();i++)
+            		  stmt.setObject(i+2, paramValues.get(i));
+             // rs = stmt.executeQuery();
+              stmt.execute();
+              obj = stmt.getObject(1);
+              /*if(rs.next()){
                     obj=rs.getObject(1);
-              }
+              }*/
         }catch(Exception e){
               throw new EasyORMException(e);
         }finally{
@@ -397,7 +401,7 @@ public class DBSelect{
 	 * @throws EasyORMException
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> List<T> getRecordsForStoredProcedure(String procedureName,Class<? extends DBObject> target,List<Object>paramValues, int startRecord, int countRecord,String orderByColumn) throws EasyORMException{
+	public <T> List<T> getRecordsForStoredProcedure(String procedureName,Class<? extends DBObject> target,List<Object>paramValues, int returnType, int startRecord, int countRecord,String orderByColumn) throws EasyORMException{
         
         T obj=null;
         ResultSet rs=null;
@@ -411,12 +415,14 @@ public class DBSelect{
         		params = this.generateParamsPlaceholder(paramValues.size());
         	 if(this.dbSchema!=null && !dbSchema.isEmpty())
         		 procedureName = dbSchema+"."+procedureName;
-        	  sqlQuery = "{call" + procedureName +"("+ params + ")}";
+        	  sqlQuery = "{ ? = call " + procedureName +"("+ params + ")}";
               stmt=conn.prepareCall(sqlQuery);
-              
-              for(int i=1;i<=paramValues.size();i++)
-            	  stmt.setObject(i, paramValues.get(i));
-              rs = stmt.executeQuery();    
+              stmt.registerOutParameter(1, returnType);
+              if(paramValues!=null&&!paramValues.isEmpty())
+            	  for(int i=0;i<paramValues.size();i++)
+            		  stmt.setObject(i+2, paramValues.get(i));
+              stmt.execute(); 
+              rs = (ResultSet)stmt.getObject(1);
               while(rs.next()){
                     obj=(T) target.getConstructor(ResultSet.class).newInstance(rs);
                     populateChildObjects(target,obj);
