@@ -23,12 +23,12 @@ import ib.easyorm.exception.EasyORMException;
 
 public class AnnotationUtil{
 
-	public static  <T>void checkTableAnnotation(Class<T> target) throws EasyORMException{
+	 public static  <T>void checkTableAnnotation(Class<T> target) throws EasyORMException{
 		if(!target.isAnnotationPresent(TableInfo.class)){
 			throw new EasyORMException(EasyORMException.TABLE_ANNOTATION_MISSING);
 		}
 	}
-	public static  <T>void checkIdColumnAnnotation(Class<T> target) throws EasyORMException{
+	 public static  <T>void checkIdColumnAnnotation(Class<T> target) throws EasyORMException{
 		if(!target.isAnnotationPresent(TableInfo.class)){
 			throw new EasyORMException(EasyORMException.TABLE_ANNOTATION_MISSING);
 		}

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DBHelper {
+ class DBHelper {
 	static List<String> parseQueryForParams(String query) throws EasyORMException{
 
 		List<String> paramsList = new ArrayList<String>();

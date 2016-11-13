@@ -45,7 +45,14 @@ public class PojoGenerator{
        private Set<String> typeNames;
        private List<Integer> nullColumns;            
        private static  String NEW_LINE = null;
-
+/**
+ * 
+ * @param pojoName - the name of the POJO to be generated
+ * @param tableName - the table name from which to retrieve the information to create the POJO entity
+ * @param schemaName - the schema name (optional)
+ * @param idColumnName - The name for the id column (typically this is your PK column)
+ * @throws EasyORMException
+ */
        private PojoGenerator( String pojoName, String tableName, String schemaName, String idColumnName) throws EasyORMException{
 
              this.pojoName=pojoName;
@@ -56,14 +63,24 @@ public class PojoGenerator{
        static {
     	   NEW_LINE = System.getProperty("line.separator");
        }
+       /**
+        * This method sets the path to the package containg your POJO/entity classes. If not set, your classes will be set in
+        * the folder where PojoGenerator is located.
+        * @param path
+        */
        public void setPathToPackage(String path){
 
              this.pathPkg=path;
        }
+       /**
+        * get the path to your POJO classes
+        * @return
+        */
        public String getPathToPackage(){
 
              return pathPkg;
        }
+       
        public String getPackage(){
 
              return pkgName;
@@ -74,6 +91,14 @@ public class PojoGenerator{
              this.pkgName=pkg;
 
        }
+       /**
+        * This method returns an instance to this class
+        * @param pojoName - the name of the POJO to be generated
+        * @param tableName - the table name from which to retrieve the information to create the POJO entity
+        * @param schemaName - the schema name (optional)
+        * @param idColumnName - The name for the id column (typically this is your PK column)
+        * @throws EasyORMException
+        */
        public static PojoGenerator getInstance(String pojoName, String tableName, String schemaName,String idColumnName) throws EasyORMException{
 
              if(pojoGen==null)         {
@@ -91,6 +116,11 @@ public class PojoGenerator{
 
              bufferSize=size;
        }
+       /**
+        * This method generated the POJO template file (pojoName.java) from database metainformation.
+        * Normally, you will call this method after after you've called the setPathToPackage method. 
+        * @throws EasyORMException
+        */
        public void generatePojo() throws EasyORMException{
 
              if(objName!=null){       
@@ -113,6 +143,11 @@ public class PojoGenerator{
 
              }                  
        }
+       /**
+        * This will annotate nullable fields with @Nullable annotation. This is just for your convenience.
+        * The code never checks this annotation.
+        * @param nullable
+        */
        public void setNullable(boolean nullable){
     	   this.nullable = nullable;
        }

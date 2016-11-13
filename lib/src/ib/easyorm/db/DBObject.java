@@ -52,16 +52,30 @@ public abstract class DBObject implements Serializable{
 	public void setEncoding(String encoding){
 		stringEncoding=encoding;
 	}
+	/**
+	 * sets the current encoding
+	 * this is used when creating string objects returned from the databse as well as insering strings into the database
+	 * @return
+	 */
+	/**
+	 * 
+	 * @return
+	 */
 	public String getEncoding(){
 		return stringEncoding;
 	}
-	private String dbSchema;
+	private static String dbSchema;
 
 
 	public DBObject() throws EasyORMException{
 		conn=ConnectionPool.getInstance().getAvailableConnection();	
 	}
-
+    
+	/**
+	 * this constructor is used internally when creating child objects
+	 * @param target
+	 * @param enclosingCls
+	 */
 	protected <T>DBObject(Class<T>target,Object enclosingCls) {
 
 		cachedResults=((DBObject)enclosingCls).cachedResults;
@@ -90,26 +104,7 @@ public abstract class DBObject implements Serializable{
 			throw new EasyORMException(e);
 		}
 	}
-	/*public DBObject(ResultSet rs) throws EasyORMException{
-		try{
-			for (int i=1;i<=rs.getMetaData().getColumnCount();i++) {
-				Object obj=rs.getObject(i);
-				if(stringEncoding!=null&&obj!=null&&obj instanceof String){
-					if(obj!=null&&obj instanceof String){
-						try{
-							cachedResults.put(rs.getMetaData().getColumnName(i), new String(((String)obj).getBytes(),stringEncoding));
-						}catch(UnsupportedEncodingException e){
-							throw new EasyORMException(e);
-						}
-					}
-				}else{
-					cachedResults.put(rs.getMetaData().getColumnName(i), obj);
-				}
-			}
-		}catch (Exception e) {
-			throw new EasyORMException(e);
-		}
-	}*/
+
 	public DBObject(Connection conn){
 		this.conn=conn;		
 	}
@@ -120,11 +115,11 @@ public abstract class DBObject implements Serializable{
 	void setConnection( Connection conn){
 		this.conn=conn;
 	}
-	public String getDbSchema(){
+	public static String getDbSchema(){
 		return dbSchema;
 	}
-	public void setDbSchema(String schemaName){
-		dbSchema=schemaName;
+	public static void setDbSchema(String schemaName){
+		dbSchema = schemaName;
 	}
 	public <T>Object createChildObject(Class<T> target) throws  EasyORMException{
 		try{
@@ -134,13 +129,23 @@ public abstract class DBObject implements Serializable{
 			throw new EasyORMException(target.getName()+EasyORMException.CONSTRUCTOR_ARGS_MISSING_OBJECT);
 		}
 	}
+	/**
+	 * Subclasses call this to get the value for a particular property 
+	 * @param name - name of the property whose value is to be retrieved 
+	 * @return - value of the property
+	 */
+	
 	protected Object getValue(String name){		
 
 		Object obj=cachedResults.get(name);
 		if(obj==null) obj=cachedResults.get(name.toUpperCase());
 		return obj;
 	}
-
+	/**
+	 * sets the value for a particular property
+	 * @param name
+	 * @return
+	 */
 	protected void setValue(String name,Object value) {
 		if(value!=null){
 			if(!paramsForUpdate.contains(name)){
@@ -157,6 +162,11 @@ public abstract class DBObject implements Serializable{
 			}
 		}
 	}
+	/**
+	 * Use this method to create new database objects such as tables, view, sequences etc
+	 * @param ddlSql
+	 * @throws EasyORMException
+	 */
 	public static void executeDDLQuery(String ddlSql) throws EasyORMException{
 
 		try{			  
@@ -167,6 +177,13 @@ public abstract class DBObject implements Serializable{
 			throw new EasyORMException(sqle);
 		}
 	}
+	/**
+	 * 
+	 * @param sqlStatement
+	 * @param params
+	 * @return
+	 * @throws EasyORMException
+	 */
 	public static int[] executeBatchUpdate(String sqlStatement,List<Object[]> params) throws EasyORMException{
 
 		int[] batchResults=null;
@@ -243,6 +260,11 @@ public abstract class DBObject implements Serializable{
 		}
 		return batchResults;
 	}
+	/**
+	 * This method inserts a single row into the database
+	 * @return - the database generated key
+	 * @throws EasyORMException
+	 */
 	public int insertAndReturnGenKey() throws  EasyORMException{
 		AnnotationUtil.checkTableAnnotation(getClass());
 		Object id=null;
@@ -278,6 +300,11 @@ public abstract class DBObject implements Serializable{
 		paramsForUpdate.clear();
 		return id!=null?((Integer)id).intValue():-1;
 	}
+	/**
+	 * This method inserts a single row into the database
+	 * @return - the number of inserted rows (if successful, should be 1 , otherwise 0)
+	 * @throws EasyORMException
+	 */
 	public int insert() throws  EasyORMException{
 		AnnotationUtil.checkTableAnnotation(getClass());
 		int result = -1;
@@ -347,14 +374,35 @@ public abstract class DBObject implements Serializable{
 		return update(false, updateByColumn);
 
 	}
+	/**
+	 * This updates a single record (the record should first be retrieved via DBSelect)
+	 * @return
+	 * @throws EasyORMException
+	 */
 	public int update() throws  EasyORMException{
 		AnnotationUtil.checkAnnotations(getClass());
 		return update(true, null);
 	}
+	/**
+	 * This method updates a record (or records) using an sql update statement (supports named parameters)
+	 * Note that this method doesn't have corresponding Java entities (they dont have to retrieved prior to calling this method)
+	 * @param updateStatement
+	 * @param paramValues
+	 * @return - the number of records updated
+	 * @throws EasyORMException
+	 */
 	public static int update(String updateStatement, HashMap<String,Object>paramValues) throws  EasyORMException{
 		
 		return DBObject.doUpdateRecord(updateStatement, paramValues);
 	}
+	/**
+	 * This method deletes a record (or records) using an sql update statement (supports named parameters)
+	 * Note that this method doesn't have corresponding Java entities (they dont have to retrieved prior to calling this method)
+	 * @param deleteStatement
+	 * @param paramValues
+	 * @return - the number of records deleted
+	 * @throws EasyORMException
+	 */
 	public static int delete(String deleteStatement, HashMap<String,Object>paramValues) throws  EasyORMException{
 		
 		return DBObject.doUpdateRecord(deleteStatement, paramValues);
@@ -420,7 +468,14 @@ public abstract class DBObject implements Serializable{
 		}
 		return doUpdate(query,params);
 	}*/
-	public int updateRange(Integer[] ids,String idColumnName) throws  EasyORMException{
+	/**
+	 * Updates a number of records depending on the IDs 
+	 * @param ids
+	 * @param idColumnName - the column name annotated with @TableInfo( "idColumnName"=some_name)
+	 * @return
+	 * @throws EasyORMException
+	 */
+	public int updateRange(Integer[] ids, String idColumnName) throws  EasyORMException{
 		AnnotationUtil.checkTableAnnotation(getClass());
 		return updateRange(ids, false, idColumnName);
 	}
@@ -449,12 +504,20 @@ public abstract class DBObject implements Serializable{
 		}
 		return idSeq;
 	}
+	
 	private int deleteRange(Integer[] ids, boolean useAutoGenColumn, String updateByColumn) throws EasyORMException{
 
 		String colName = useAutoGenColumn ? getClass().getAnnotation(TableInfo.class).idColumnName() : updateByColumn;
 		String qualifiedName = dbSchema!=null?dbSchema+"."+getClass().getAnnotation(TableInfo.class).tableName():getClass().getAnnotation(TableInfo.class).tableName();
 		return doUpdate("delete from "+qualifiedName+" where "+colName+" IN ("+getIds(ids)+")");
 	}
+	/**
+	 * deletes a number of records
+	 * @param ids - IDs used for locating records to delete
+	 * @param updateByColumn - the column name annotated with @TableInfo( "idColumnName"=some_name)
+	 * @return
+	 * @throws EasyORMException
+	 */
 	public int deleteRange(Integer[] ids, String updateByColumn) throws EasyORMException{
 		AnnotationUtil.checkTableAnnotation(getClass());
 		return deleteRange(ids, false, updateByColumn);
@@ -467,6 +530,12 @@ public abstract class DBObject implements Serializable{
 		AnnotationUtil.checkAnnotations(getClass());
 		return delete(true, null);
 	}
+	/**
+	 * deletes a single row from the databse
+	 * @param deleteByColumn - 
+	 * @return
+	 * @throws EasyORMException
+	 */
 	public int delete(String deleteByColumn) throws EasyORMException{
 		AnnotationUtil.checkTableAnnotation(getClass());
 		return delete(false, deleteByColumn);

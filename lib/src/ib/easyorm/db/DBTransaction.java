@@ -28,11 +28,22 @@ public class DBTransaction{
 	private Connection trxConn;
 	private IsolationLevel isolationLevel=IsolationLevel.TRX_UNCOMMITTED_READ;
 	DBTransaction(){}
+	/**
+	 * This constructor creates a database transaction and sets its properties (e.g. the default isolation level is uncommitted read)
+	 * @param connPool
+	 * @throws EasyORMException
+	 */
 	public DBTransaction(ConnectionPool connPool) throws  EasyORMException{
 		this.trxConn=connPool.getAvailableConnection();
 		setTransactionProperties();
 	}
-	public DBTransaction(ConnectionPool connPool,IsolationLevel isolationLevel) throws EasyORMException{
+	/**
+	 * The constructor creates a database transaction and sets its properties
+	 * @param connPool
+	 * @param isolationLevel
+	 * @throws EasyORMException
+	 */
+	public DBTransaction(ConnectionPool connPool, IsolationLevel isolationLevel) throws EasyORMException{
 		this(connPool);
 		this.isolationLevel=isolationLevel;
 	}
@@ -81,6 +92,10 @@ public class DBTransaction{
 	void setTransactionConnection(Connection conn) {
 		trxConn=conn;		
 	}
+	/**
+	 * The method commits the transaction and returns the active connection to the connection pool. It also closes the transaction.
+	 * @throws EasyORMException
+	 */
 	public void commit() throws EasyORMException {
 		try{
 			trxConn.commit();
@@ -89,6 +104,10 @@ public class DBTransaction{
 			throw new EasyORMException(e);
 		}
 	}
+	/**
+	 * The method rollbacks the transaction a and returns the active connection to the connection pool. It also closes the transaction.
+	 * @throws EasyORMException
+	 */
 	public void rollback() throws EasyORMException {
 		try{
 			trxConn.rollback();		
@@ -97,6 +116,11 @@ public class DBTransaction{
 			throw new EasyORMException(e);
 		}
 	}
+	/**
+	 * database isolation levels from the most restrictive to the least restrictive
+	 * @author XXX
+	 *
+	 */
 	public static enum IsolationLevel { TRX_SERIALIZABLE, TRX_REAPEATABLE_READ, TRX_COMMITTED_READ, TRX_UNCOMMITTED_READ };
 
 }

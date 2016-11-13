@@ -43,4 +43,6 @@ public class EasyORMException extends Exception{
 	public static final String NO_WHERE_CLAUSE_PARAMETERS = "No parameters have been provided in the where clause";
 	public static final String MULTIPLE_RECORDS = "Query has returned multiple records where only one was expected";
 	public static final String FROM_CLAUSE_MISSING = "No from clause has been found for the query ";
-}
+	public static final String OUT_PARAM_MISSING = "At least one OUT parameter must be specified";
+	public static final String OUT_CURSOR_MISSING = "OUT cursor parameter must be specified or the cursor position is wrong";
+} 
