@@ -516,25 +516,25 @@ public class DBSelect{
         return obj;
   }
 	/**
-	 * This method returns a result set and converts it to a POJO object specified in the second parameter
+	 * This method expects the stored procedure/function to return either a result set or a cursor and converts it to a POJO object specified in the second parameter
+	 * your stored proc/function (PostgreSQL assumed) might look like either 
+	 * create or replace some_proc(...) returns refcursor AS.... 	//(cursor returned in a return value)		
+	 * create or replace some_proc(OUT cur_var refcursor, ...) AS  //(cursor returned in an OUT value at position 1)
 	 * @param procedureName
 	 * @param target
 	 * @param paramValues
-	 * @param startRecord
-	 * @param countRecord
-	 * @param orderByColumn
+	 * @param returnType - used only when the procedure  returns a cursor (ignored for Result sets)(for Postgre java.sql.Types.OTHER, 
+	 * for Oracle oracle.jdbc.OracleCursor etc)
 	 * @return
 	 * @throws EasyORMException
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> List<T> getRecordsForStoredProcedure(String procedureName,Class<? extends DBObject> target,List<Object>paramValues, int returnType, int startRecord, int countRecord,String orderByColumn) throws EasyORMException{
+	public <T> List<T> getRecordsForStoredProcedure(String procedureName,Class<? extends DBObject> target,List<Object>paramValues, int returnType) throws EasyORMException{
         
         T obj=null;
         ResultSet rs=null;
         CallableStatement stmt=null;
         List<T> objList = new ArrayList<T>();
-        countRecord = (countRecord<=0)?recNum:countRecord;
-        startRecord = (startRecord<0)?0:startRecord;
         try{
         	String params = "";
         	if(paramValues!=null&&!paramValues.isEmpty())
@@ -547,8 +547,13 @@ public class DBSelect{
               if(paramValues!=null&&!paramValues.isEmpty())
             	  for(int i=0;i<paramValues.size();i++)
             		  stmt.setObject(i+2, paramValues.get(i));
-              stmt.execute(); 
-              rs = (ResultSet)stmt.getObject(1);
+              boolean result = stmt.execute(); //true if a Result set is returned              
+              
+              rs = result ? stmt.getResultSet() : (ResultSet)stmt.getObject(1);
+            	               		
+              if(rs == null)
+            	  throw new EasyORMException(EasyORMException.RESULTSET_CURSOR_NOT_RETURNED);
+              
               while(rs.next()){
                     obj=(T) target.getConstructor(ResultSet.class).newInstance(rs);
                     if(childObjectNames!=null&&childObjectNames.length>0)
@@ -564,28 +569,25 @@ public class DBSelect{
         return objList;
   }
 	/**
-	 * This method expects a stored procedure / function to return a cursor  
-	 * your stored proc/function must look like either 
+	 * This method expects a stored procedure / function to return a cursor (not a result set despite its name)  (depracated in favour of getRecordsForStoredProcedure, which does the same
+	 * thing and can also handle result sets , not just cursors)
+	 * your stored proc/function (PostgreSQL assumed) might look like either 
 	 * create or replace some_proc(...) returns refcursor AS.... 	//(cursor returned in a return value)		
 	 * create or replace some_proc(OUT cur_var refcursor, ...) AS  //(cursor returned in an OUT value at position 1)
 	 * @param procedureName
 	 * @param target - the data returned by the cursor are mapped to the target POJO 
 	 * @param paramValues -IN parameters
 	 * @param returnType - cursor type (e.g. oracle.sql.Types.OracleCursor )
-	 * @param startRecord - used for paging (set to 0 if you dont want paging)
-	 * @param countRecord - used for paging (set to 0 if you dont want paging)
-	 * @param orderByColumn - used for sorting
 	 * @return - a list of instances of DBObject subclasses
 	 * @throws EasyORMException
 	 */
-public <T> List<T> getResultSetForStoredProcedure(String procedureName,Class<? extends DBObject> target,List<Object>paramValues, int returnType, int startRecord, int countRecord,String orderByColumn) throws EasyORMException{
+	@Deprecated
+public <T> List<T> getResultSetForStoredProcedure(String procedureName,Class<? extends DBObject> target,List<Object>paramValues, int returnType) throws EasyORMException{
         
         T obj=null;
         ResultSet rs=null;
         CallableStatement stmt=null;
         List<T> objList = new ArrayList<T>();
-        countRecord = (countRecord<=0)?recNum:countRecord;
-        startRecord = (startRecord<0)?0:startRecord;
         try{
         	String params = "";
         	if(paramValues!=null&&!paramValues.isEmpty())
@@ -599,7 +601,10 @@ public <T> List<T> getResultSetForStoredProcedure(String procedureName,Class<? e
             	  for(int i=0;i<paramValues.size();i++)
             		  stmt.setObject(i+1, paramValues.get(i));
               stmt.execute();
-              rs = (ResultSet) stmt.getObject(1);               
+              rs = (ResultSet) stmt.getObject(1);             
+              
+              if(rs == null)
+            	  throw new EasyORMException(EasyORMException.CURSOR_NOT_RETURNED);
               
               while(rs.next()){
                     obj=(T) target.getConstructor(ResultSet.class).newInstance(rs);
@@ -635,14 +640,13 @@ public <T> List<T> getResultSetForStoredProcedure(String procedureName,Class<? e
  * @return
  * @throws EasyORMException
  */
-public  List<Object> getRecordsForStoredProcedure(String procedureName,Class<? extends DBObject> target,List<Integer>inParamPositions,List<Object>inParamValues, List<Integer>outParamPositions,List<Integer>outParamTypes, int cursorPos, int startRecord, int countRecord,String orderByColumn) throws EasyORMException{
+public  List<Object> getRecordsForStoredProcedure(String procedureName,Class<? extends DBObject> target,List<Integer>inParamPositions,List<Object>inParamValues, List<Integer>outParamPositions,List<Integer>outParamTypes, int cursorPos) throws EasyORMException{
     
     Object obj=null;
     ResultSet rs=null;
     CallableStatement stmt=null;
     List<Object> objList = new ArrayList<Object>();
-    countRecord = (countRecord<=0)?recNum:countRecord;
-    startRecord = (startRecord<0)?0:startRecord;
+
     String paramsIn = "";
     String paramsOut;
     boolean parmsIn = false;
@@ -673,10 +677,13 @@ public  List<Object> getRecordsForStoredProcedure(String procedureName,Class<? e
           if(parmsIn)
         	  for(int i=0;i<inParamValues.size();i++)
         		  stmt.setObject(inParamPositions.get(i), inParamValues.get(i));
-          stmt.execute();
+          
+         stmt.execute();
          
           if(cursorPos > 0){
-        	  rs = (ResultSet) stmt.getObject(cursorPos);                        
+        	  rs = (ResultSet) stmt.getObject(cursorPos);  
+        	  if(rs == null)
+            	  throw new EasyORMException(EasyORMException.CURSOR_NOT_RETURNED);
           while(rs.next()){
                 obj= target.getConstructor(ResultSet.class).newInstance(rs);
                 if(childObjectNames!=null&&childObjectNames.length>0)

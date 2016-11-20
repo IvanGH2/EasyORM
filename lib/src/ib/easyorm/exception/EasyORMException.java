@@ -45,4 +45,7 @@ public class EasyORMException extends Exception{
 	public static final String FROM_CLAUSE_MISSING = "No from clause has been found for the query ";
 	public static final String OUT_PARAM_MISSING = "At least one OUT parameter must be specified";
 	public static final String OUT_CURSOR_MISSING = "OUT cursor parameter must be specified or the cursor position is wrong";
+	public static final String RESULTSET_NOT_RETURNED = "Result set not returned";
+	public static final String CURSOR_NOT_RETURNED = "Result set not returned";
+	public static final String RESULTSET_CURSOR_NOT_RETURNED = "Neither a Result set nor a Cursor returned";
 } 
